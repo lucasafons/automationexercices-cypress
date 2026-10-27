@@ -7,6 +7,7 @@ const seletores = {
   botaoLogin: '[data-qa="login-button"]',
   erroLogin: 'div.login-form form p',
   tituloNovoCadastro: 'div.signup-form h2',
+  erroEmailExistente: 'div.signup-form form p',
   nomeCadastro: '[data-qa="signup-name"]',
   emailCadastro: '[data-qa="signup-email"]',
   botaoCadastro: '[data-qa="signup-button"]',
@@ -53,6 +54,29 @@ function enviarIdentificacao() {
   cy.get(seletores.botaoCadastro).click();
 }
 
+function gerarDadosCadastro(prefixo) {
+  const identificador = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+  return {
+    nome: `Cypress ${prefixo} User`,
+    email: `cypress-${prefixo}-${identificador}@example.com`,
+    senha: "CypressTest123!",
+    diaNascimento: "10",
+    mesNascimento: "May",
+    anoNascimento: "1990",
+    primeiroNome: "Cypress",
+    sobrenome: `${prefixo} User`,
+    empresa: "Automation Tests",
+    endereco: "100 Test Avenue",
+    complementoEndereco: "Suite 10",
+    pais: "United States",
+    estado: "California",
+    cidade: "Los Angeles",
+    cep: "90001",
+    celular: "1234567890",
+  };
+}
+
 function preencherCredenciais(email, senha) {
   cy.get(seletores.emailLogin).type(email);
   cy.get(seletores.senhaLogin).type(senha);
@@ -86,6 +110,17 @@ function criarConta() {
   cy.get(seletores.botaoCriarConta).click();
 }
 
+function cadastrarUsuario(usuario) {
+  preencherIdentificacao(usuario);
+  enviarIdentificacao();
+  validarFormularioInformacoesConta();
+  preencherInformacoesConta(usuario);
+  criarConta();
+  validarContaCriada();
+  continuarAposCriacao();
+  validarUsuarioLogado(usuario.nome);
+}
+
 function continuarAposCriacao() {
   cy.get(seletores.botaoContinuar).click();
 }
@@ -110,6 +145,12 @@ function validarFormularioNovoCadastro() {
   cy.get(seletores.tituloNovoCadastro)
     .should("be.visible")
     .and("contain.text", "New User Signup!");
+}
+
+function validarEmailJaCadastrado() {
+  cy.get(seletores.erroEmailExistente)
+    .should("be.visible")
+    .and("contain.text", "Email Address already exist!");
 }
 
 function validarFormularioLogin() {
@@ -153,16 +194,19 @@ module.exports = {
   abrirFormularioCadastro,
   preencherIdentificacao,
   enviarIdentificacao,
+  gerarDadosCadastro,
   preencherCredenciais,
   enviarLogin,
   preencherInformacoesConta,
   criarConta,
+  cadastrarUsuario,
   continuarAposCriacao,
   sair,
   excluirConta,
   continuarAposExclusao,
   validarHomeVisivel,
   validarFormularioNovoCadastro,
+  validarEmailJaCadastrado,
   validarFormularioLogin,
   validarCredenciaisInvalidas,
   validarFormularioInformacoesConta,
