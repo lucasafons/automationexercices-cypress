@@ -10,6 +10,9 @@ const seletores = {
   disponibilidadeProduto: ".product-information p:nth-of-type(2)",
   condicaoProduto: ".product-information p:nth-of-type(3)",
   marcaProduto: ".product-information p:nth-of-type(4)",
+  campoBusca: "#search_product",
+  botaoBusca: "#submit_search",
+  tituloProdutosPesquisados: "h2.title",
 };
 
 function abrirListaProdutos() {
@@ -23,11 +26,28 @@ function abrirPrimeiroProduto() {
     .click();
 }
 
+function buscarProduto(termo) {
+  cy.get(seletores.campoBusca).type(termo);
+  cy.get(seletores.botaoBusca).click();
+}
+
 function validarListaProdutos() {
   cy.get(seletores.tituloListaProdutos)
     .should("be.visible")
     .and("contain.text", "All Products");
   cy.get(seletores.produto).should("have.length.greaterThan", 0);
+}
+
+function validarResultadosBusca(produtoEsperado) {
+  cy.get(seletores.tituloProdutosPesquisados)
+    .should("be.visible")
+    .and("contain.text", "Searched Products");
+  cy.get(seletores.produto)
+    .should("have.length.greaterThan", 0)
+    .each(($produto) => {
+      cy.wrap($produto).should("be.visible");
+    });
+  cy.contains(seletores.produto, produtoEsperado).should("be.visible");
 }
 
 function validarPaginaDetalhesProduto() {
@@ -53,6 +73,8 @@ function validarPaginaDetalhesProduto() {
 module.exports = {
   abrirListaProdutos,
   abrirPrimeiroProduto,
+  buscarProduto,
   validarListaProdutos,
+  validarResultadosBusca,
   validarPaginaDetalhesProduto,
 };
