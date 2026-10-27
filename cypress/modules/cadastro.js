@@ -1,6 +1,11 @@
 const seletores = {
   logoHome: 'a[href="/"] img',
   linkCadastroLogin: 'a[href="/login"]',
+  tituloLogin: 'div.login-form h2',
+  emailLogin: '[data-qa="login-email"]',
+  senhaLogin: '[data-qa="login-password"]',
+  botaoLogin: '[data-qa="login-button"]',
+  erroLogin: 'div.login-form form p',
   tituloNovoCadastro: 'div.signup-form h2',
   nomeCadastro: '[data-qa="signup-name"]',
   emailCadastro: '[data-qa="signup-email"]',
@@ -27,6 +32,7 @@ const seletores = {
   contaCriada: '[data-qa="account-created"]',
   botaoContinuar: '[data-qa="continue-button"]',
   linkExcluirConta: 'a[href="/delete_account"]',
+  linkLogout: 'a[href="/logout"]',
   contaExcluida: '[data-qa="account-deleted"]',
 };
 
@@ -45,6 +51,15 @@ function preencherIdentificacao(usuario) {
 
 function enviarIdentificacao() {
   cy.get(seletores.botaoCadastro).click();
+}
+
+function preencherCredenciais(email, senha) {
+  cy.get(seletores.emailLogin).type(email);
+  cy.get(seletores.senhaLogin).type(senha);
+}
+
+function enviarLogin() {
+  cy.get(seletores.botaoLogin).click();
 }
 
 function preencherInformacoesConta(usuario) {
@@ -79,6 +94,10 @@ function excluirConta() {
   cy.get(seletores.linkExcluirConta).click();
 }
 
+function sair() {
+  cy.get(seletores.linkLogout).click();
+}
+
 function continuarAposExclusao() {
   cy.get(seletores.botaoContinuar).click();
 }
@@ -91,6 +110,18 @@ function validarFormularioNovoCadastro() {
   cy.get(seletores.tituloNovoCadastro)
     .should("be.visible")
     .and("contain.text", "New User Signup!");
+}
+
+function validarFormularioLogin() {
+  cy.get(seletores.tituloLogin)
+    .should("be.visible")
+    .and("contain.text", "Login to your account");
+}
+
+function validarCredenciaisInvalidas() {
+  cy.get(seletores.erroLogin)
+    .should("be.visible")
+    .and("contain.text", "Your email or password is incorrect!");
 }
 
 function validarFormularioInformacoesConta() {
@@ -122,13 +153,18 @@ module.exports = {
   abrirFormularioCadastro,
   preencherIdentificacao,
   enviarIdentificacao,
+  preencherCredenciais,
+  enviarLogin,
   preencherInformacoesConta,
   criarConta,
   continuarAposCriacao,
+  sair,
   excluirConta,
   continuarAposExclusao,
   validarHomeVisivel,
   validarFormularioNovoCadastro,
+  validarFormularioLogin,
+  validarCredenciaisInvalidas,
   validarFormularioInformacoesConta,
   validarContaCriada,
   validarUsuarioLogado,
